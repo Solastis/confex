@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { str, bool, num, enm } from '@/core/factories';
-import { defineConfig } from '@/core/defineConfig';
+import { str, bool, num, enm, Confex } from '../src';
 
 describe('StringValidator', () => {
   it('returns default when input is undefined', () => {
@@ -49,10 +48,12 @@ describe('defineConfig', () => {
     process.env.PORT = '8080';
     process.env.DEBUG = 'true';
 
-    const config = defineConfig({
+    const config = new Confex({
       PORT: num(),
       DEBUG: bool(),
-    });
+    })
+      .validate()
+      .get();
 
     expect(config.PORT).toBe(8080);
     expect(config.DEBUG).toBe(true);

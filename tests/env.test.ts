@@ -1,4 +1,4 @@
-import { bool, defineConfig, num, str } from '../src/core';
+import { bool, Confex, num, str } from '../src';
 import dotenv from 'dotenv';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
@@ -32,11 +32,13 @@ describe('Environment Config (.env.test)', () => {
   });
 
   it('parses environment variables using defineConfig', () => {
-    const config = defineConfig({
+    const config = new Confex({
       NODE_ENV: str().default('test'),
       DEBUG: bool().default(false),
       PORT: num().default(0),
-    });
+    })
+      .validate()
+      .get();
     expect(config.NODE_ENV).toBe('test');
     expect(config.DEBUG).toBe(true);
     expect(config.PORT).toBe(3000);
@@ -49,11 +51,13 @@ describe('Environment Config (.env.test)', () => {
     delete process.env.NODE_ENV;
     delete process.env.DEBUG;
     delete process.env.PORT;
-    const config = defineConfig({
+    const config = new Confex({
       NODE_ENV: str().default('fallback_env'),
       DEBUG: bool().default(false),
       PORT: num().default(1234),
-    });
+    })
+      .validate()
+      .get();
     expect(config.NODE_ENV).toBe('fallback_env');
     expect(config.DEBUG).toBe(false);
     expect(config.PORT).toBe(1234);
@@ -61,10 +65,11 @@ describe('Environment Config (.env.test)', () => {
 
   it('throws if required variable is missing and no default', () => {
     delete process.env.NODE_ENV;
-    expect(() =>
-      defineConfig({
-        NODE_ENV: str(),
-      }),
+    expect(
+      () =>
+        new Confex({
+          NODE_ENV: str(),
+        }).validate(),
     ).toThrow();
   });
 });

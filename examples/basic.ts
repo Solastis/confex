@@ -1,4 +1,4 @@
-import { defineConfig, str, bool, num, enm } from '@/index';
+import { str, bool, num, enm, Confex } from '../src';
 
 /**
  * Example: Defining and validating a configuration schema.
@@ -13,11 +13,13 @@ import { defineConfig, str, bool, num, enm } from '@/index';
  * the default value is used (if provided). All values are validated according
  * to their type and constraints. The resulting config object is returned.
  */
-const config = defineConfig({
+const config = new Confex({
   name: str().default('John'),
   age: num().min(18).max(100),
   isAdmin: bool().default(false),
   role: enm(['admin', 'user']).default('user'),
-});
+})
+  .validate()
+  .get();
 
 console.log(config);
