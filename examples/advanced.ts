@@ -8,7 +8,7 @@ const traditionalConfig = new Confex({
   DATABASE_URL: str(),
   PORT: num({ default: 3000, min: 1000, max: 9999 }),
   DEBUG: bool({ default: false }),
-  NODE_ENV: enm(['development', 'production'], { default: 'development' }),
+  NODE_ENV: enm(['development', 'production'] as const, { default: 'development' }),
 }).validate().get();
 
 console.log('Traditional config:', traditionalConfig);

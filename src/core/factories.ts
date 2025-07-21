@@ -1,5 +1,12 @@
+import { TupleValidator } from '@/validators/TupleValidator';
 import { StringValidator, BooleanValidator, NumberValidator, EnumValidator } from '../validators';
-import type { StringOptions, BooleanOptions, NumberOptions, EnumOptions } from './types';
+import type { 
+  StringValidatorOptions, 
+  BooleanValidatorOptions, 
+  NumberValidatorOptions, 
+  EnumValidatorOptions, 
+  TupleValidatorOptions 
+} from './types';
 
 /**
  * Creates a string validator with optional configuration
@@ -11,10 +18,13 @@ import type { StringOptions, BooleanOptions, NumberOptions, EnumOptions } from '
  * const required = str(); // Required string with no default
  * ```
  */
-export const str = (opts: StringOptions = {}): StringValidator => {
+export const str = (opts: StringValidatorOptions = {}): StringValidator => {
   let validator = new StringValidator();
   if (opts.optional) validator = validator.optional();
   if (opts.default !== undefined) validator = validator.default(opts.default);
+  if (opts.minLength !== undefined) validator = validator.minLength(opts.minLength);
+  if (opts.maxLength !== undefined) validator = validator.maxLength(opts.maxLength);
+  if (opts.pattern) validator = validator.pattern(opts.pattern);
   return validator;
 };
 
@@ -28,7 +38,7 @@ export const str = (opts: StringOptions = {}): StringValidator => {
  * const isRequired = bool(); // Required boolean
  * ```
  */
-export const bool = (opts: BooleanOptions = {}): BooleanValidator => {
+export const bool = (opts: BooleanValidatorOptions = {}): BooleanValidator => {
   let validator = new BooleanValidator();
   if (opts.optional) validator = validator.optional();
   if (opts.default !== undefined) validator = validator.default(opts.default);
@@ -45,7 +55,7 @@ export const bool = (opts: BooleanOptions = {}): BooleanValidator => {
  * const percentage = num({ min: 0, max: 100, default: 0 });
  * ```
  */
-export const num = (opts: NumberOptions = {}): NumberValidator => {
+export const num = (opts: NumberValidatorOptions = {}): NumberValidator => {
   let validator = new NumberValidator();
   if (opts.min !== undefined) validator = validator.min(opts.min);
   if (opts.max !== undefined) validator = validator.max(opts.max);
@@ -66,12 +76,33 @@ export const num = (opts: NumberOptions = {}): NumberValidator => {
  * const role = enm(['admin', 'user']); // Required enum
  * ```
  */
-export const enm = <T extends string>(
-  values: T[],
-  opts: EnumOptions<T> = {},
-): EnumValidator<T> => {
-  let validator = new EnumValidator(values);
+export const enm = <T extends readonly string[]>(
+  values: T,
+  opts: Partial<Omit<EnumValidatorOptions<T>, 'allowedValues'>> = {}
+): EnumValidator<T[number]> => {
+  let validator = new EnumValidator([...values]); // Convert readonly to mutable array
   if (opts.optional) validator = validator.optional();
   if (opts.default !== undefined) validator = validator.default(opts.default);
+  return validator;
+};
+
+/**
+ * Creates a tuple validator with optional configuration
+ * @param values - Array of allowed tuple values
+ * @param opts - Configuration options for the tuple validator
+ * @returns A configured TupleValidator instance
+ * @example
+ * ```typescript
+ * const tuple = tpl([[1, 'a'], [2, 'b']]);
+ * const customTuple = tpl([[true, 42], [false, 0]], { default: [true, 42] });
+ * ```
+ */
+export const tpl = <T extends any[]>(
+  values: T[],
+  opts: Partial<Pick<TupleValidatorOptions<readonly T[]>, 'optional' | 'default'>> = {}
+): TupleValidator<T> => {
+  let validator = new TupleValidator(values);
+  if (opts.optional) validator = validator.optional();
+  if (opts.default !== undefined) validator = validator.default(opts.default as T);
   return validator;
 };

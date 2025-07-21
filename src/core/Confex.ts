@@ -1,4 +1,4 @@
-import type { Schema } from './types';
+import type { Validator } from './validation/Validator';
 
 /**
  * Main configuration validation class
@@ -21,15 +21,15 @@ import type { Schema } from './types';
  * console.log(config.DEBUG); // boolean
  * ```
  */
-export class Confex<T extends Record<string, unknown>> {
+export class Confex<T extends Record<string, any> = Record<string, any>> {
   private validated = false;
-  private config: { [K in keyof T]: T[K] } | null = null;
+  private config: T | null = null;
 
   /**
    * Create a new Confex instance with the given schema
    * @param schema - Object mapping environment variable names to validators
    */
-  constructor(private schema: Schema<T>) {}
+  constructor(private schema: Record<string, any>) {}
 
   /**
    * Validate all environment variables according to the schema
@@ -41,12 +41,12 @@ export class Confex<T extends Record<string, unknown>> {
    * @throws {ValidationError} If any environment variable fails validation
    */
   validate(): this {
-    const result = {} as { [K in keyof T]: T[K] };
+    const result = {} as any;
 
     for (const key in this.schema) {
       const validator = this.schema[key];
       const raw = process.env[key];
-      result[key] = validator.validate(raw, key) as T[typeof key];
+      result[key] = validator.validate(raw, key);
     }
 
     this.config = result;

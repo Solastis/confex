@@ -1,6 +1,6 @@
 # Confex
 
-[![npm version](https://badge.fury.io/js/confex-ts.svg)](https://badge.fury.io/js/confex-ts)
+[![npm version](https://badge.fury.io/js/confex.svg)](https://badge.fury.io/js/confex)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,17 +22,17 @@ Confex provides a simple, powerful, and type-safe way to validate environment va
 ## 📦 Installation
 
 ```bash
-npm install confex-ts
+npm install confex
 # or
-yarn add confex-ts
+yarn add confex
 # or
-pnpm add confex-ts
+pnpm add confex
 ```
 
 ## 🚀 Quick Start
 
 ```typescript
-import { Confex, str, num, bool, enm } from 'confex-ts';
+import { Confex, str, num, bool, enm } from 'confex';
 
 // Define your configuration schema
 const config = new Confex({

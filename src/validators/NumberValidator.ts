@@ -45,9 +45,9 @@ export class NumberValidator extends Validator<number> {
       minValue?: number;
       maxValue?: number;
       mustBeInteger?: boolean;
-    },
+    } = {},
   ): this {
-    const Ctor = this.constructor as new (...allowedValues: number[]) => this;
+    const Ctor = this.constructor as new () => this;
     const copy = new Ctor() as this;
     Object.assign(copy, this, props);
     return copy;

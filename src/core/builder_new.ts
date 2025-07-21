@@ -1,12 +1,12 @@
 import { Confex } from './Confex';
-import type { Validator } from './validation/Validator';
+import type { FlexibleSchema } from './types';
 
 /**
  * A builder pattern for creating and configuring Confex instances
  * Provides a fluent API for more complex configuration scenarios
  */
 export class ConfexBuilder<T extends Record<string, unknown> = {}> {
-  private schema: Record<string, any> = {};
+  private schema: FlexibleSchema = {} as FlexibleSchema;
   private prefix?: string;
   private strict: boolean = true;
 
@@ -18,7 +18,7 @@ export class ConfexBuilder<T extends Record<string, unknown> = {}> {
    */
   field<K extends string, V>(
     key: K,
-    validator: any
+    validator: import('./validation').Validator<V>
   ): ConfexBuilder<T & Record<K, V>> {
     (this.schema as any)[key] = validator;
     return this as any;
@@ -28,6 +28,13 @@ export class ConfexBuilder<T extends Record<string, unknown> = {}> {
    * Set a prefix for all environment variables
    * @param prefix - The prefix to prepend to all keys
    * @returns The builder instance for chaining
+   * @example
+   * ```typescript
+   * const config = new ConfexBuilder()
+   *   .prefix('APP_')
+   *   .field('PORT', num({ default: 3000 }))
+   *   .build(); // Will look for APP_PORT
+   * ```
    */
   withPrefix(prefix: string): this {
     this.prefix = prefix;
@@ -52,9 +59,9 @@ export class ConfexBuilder<T extends Record<string, unknown> = {}> {
   build(): Confex<T> {
     // If prefix is set, modify the schema to use prefixed keys
     if (this.prefix) {
-      const prefixedSchema: Record<string, any> = {};
+      const prefixedSchema = {} as FlexibleSchema;
       for (const [key, validator] of Object.entries(this.schema)) {
-        prefixedSchema[this.prefix + key] = validator;
+        (prefixedSchema as any)[this.prefix + key] = validator;
       }
       return new Confex(prefixedSchema);
     }
@@ -66,5 +73,15 @@ export class ConfexBuilder<T extends Record<string, unknown> = {}> {
 /**
  * Factory function to create a new configuration builder
  * @returns A new ConfexBuilder instance
+ * 
+ * @example
+ * ```typescript
+ * const config = confex()
+ *   .field('PORT', num({ default: 3000 }))
+ *   .field('DATABASE_URL', str())
+ *   .build()
+ *   .validate()
+ *   .get();
+ * ```
  */
 export const confex = () => new ConfexBuilder();

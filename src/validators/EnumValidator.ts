@@ -1,4 +1,4 @@
-import { Validator } from '@/core/validation';
+import { Validator, ValidationError } from '@/core/validation';
 
 export class EnumValidator<T> extends Validator<T> {
   public readonly allowedValues: T[];
@@ -19,12 +19,20 @@ export class EnumValidator<T> extends Validator<T> {
     return copy;
   }
 
-  parse(value: unknown): T {
-    if (!this.allowedValues.includes(value as T)) {
-      throw new Error(
-        `Value ${value} is not one of: ${this.allowedValues.join(', ')}`,
+  protected parse(value: string | number): T {
+    // Convert value to string for comparison since enums are typically strings
+    const stringValue = String(value);
+    
+    if (!this.allowedValues.some(allowedValue => String(allowedValue) === stringValue)) {
+      throw new ValidationError(
+        'value',
+        `one of: ${this.allowedValues.map(v => `"${String(v)}"`).join(', ')}`,
+        value
       );
     }
-    return value as T;
+    
+    // Return the matching allowed value to maintain type consistency
+    const matchedValue = this.allowedValues.find(allowedValue => String(allowedValue) === stringValue);
+    return matchedValue!;
   }
 }

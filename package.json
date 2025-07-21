@@ -1,6 +1,6 @@
 {
   "name": "confex",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Type-safe configuration validation library for Node.js and TypeScript development environments.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
