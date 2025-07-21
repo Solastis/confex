@@ -14,10 +14,10 @@ import { str, bool, num, enm, Confex } from '../src';
  * to their type and constraints. The resulting config object is returned.
  */
 const config = new Confex({
-  name: str().default('John'),
-  age: num().min(18).max(100),
-  isAdmin: bool().default(false),
-  role: enm(['admin', 'user']).default('user'),
+  name: str({ default: 'John' }),
+  age: num({ min: 18, max: 100 }),
+  isAdmin: bool({ default: false }),
+  role: enm(['admin', 'user'], { default: 'user' }),
 })
   .validate()
   .get();
